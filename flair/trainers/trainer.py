@@ -580,17 +580,32 @@ class ModelTrainer:
                     and bad_epochs == 0
                 ):
                     print("saving best model")
+                    temp = self.model.document_embeddings.tokenizer
+                    self.model.document_embeddings.tokenizer = None
+    
                     self.model.save(base_path / "best-model.pt")
+
+                    self.model.document_embeddings.tokenizer = temp
 
                     if anneal_with_prestarts:
                         current_state_dict = self.model.state_dict()
                         self.model.load_state_dict(last_epoch_model_state_dict)
+
+                        temp = self.model.document_embeddings.tokenizer
+                        self.model.document_embeddings.tokenizer = None
+
                         self.model.save(base_path / "pre-best-model.pt")
+
+                        self.model.document_embeddings.tokenizer = temp
+
                         self.model.load_state_dict(current_state_dict)
 
             # if we do not use dev data for model selection, save final model
             if save_final_model and not param_selection_mode:
+                temp = self.model.document_embeddings.tokenizer
+                self.model.document_embeddings.tokenizer = None
                 self.model.save(base_path / "final-model.pt")
+                self.model.document_embeddings.tokenizer = temp
 
         except KeyboardInterrupt:
             log_line(log)
@@ -601,6 +616,8 @@ class ModelTrainer:
 
             if not param_selection_mode:
                 log.info("Saving model ...")
+                temp = self.model.document_embeddings.tokenizer
+                self.model.document_embeddings.tokenizer = None
                 self.model.save(base_path / "final-model.pt")
                 log.info("Done.")
 

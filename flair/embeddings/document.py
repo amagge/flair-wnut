@@ -5,6 +5,7 @@ from typing import List, Union
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from transformers import BertTokenizer, AlbertTokenizer, AutoTokenizer, AutoConfig, AutoModel
+from transformers import BertweetTokenizer, BertweetModel, BertweetConfig, RobertaConfig, RobertaModel
 
 import flair
 from flair.data import Sentence
@@ -56,10 +57,17 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
         # load tokenizer and transformer model
+        if model == "vinai/bertweet-base":
+            log.info("Special case: %s", model)
+            self.tokenizer = BertweetTokenizer.from_pretrained(model)
+            config = BertweetConfig.from_pretrained(model, output_hidden_states=True)
+            self.model = BertweetModel.from_pretrained(model, config=config)
+        else:
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         config = AutoConfig.from_pretrained(model, output_hidden_states=True)
         self.model = AutoModel.from_pretrained(model, config=config)
 
+        log.info("Max length: %s", self.tokenizer.model_max_length)
         # model name
         self.name = 'transformer-document-' + str(model)
 
@@ -177,6 +185,10 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
 
         # reload tokenizer to get around serialization issues
         model_name = self.name.split('transformer-document-')[-1]
+        if model_name == "vinai/bertweet-base":
+            log.info("Special case: %s", model_name)
+            self.tokenizer = BertweetTokenizer.from_pretrained(model_name)
+        else:
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 
