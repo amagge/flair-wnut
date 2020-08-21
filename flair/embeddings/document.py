@@ -111,7 +111,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
 
         # gradients are enabled if fine-tuning is enabled
         gradient_context = torch.enable_grad() if (self.fine_tune and self.training) else torch.no_grad()
-        max_len = min ([self.tokenizer.model_max_length, 256])
+        max_len = min ([self.tokenizer.model_max_length, 256]) if self.tokenizer else 256
         with gradient_context:
 
             # first, subtokenize each sentence and find out into how many subtokens each token was divided
