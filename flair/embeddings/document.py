@@ -67,7 +67,8 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
             config = AutoConfig.from_pretrained(model, output_hidden_states=True)
             self.model = AutoModel.from_pretrained(model, config=config)
 
-        log.info("Max length: %s", self.tokenizer.model_max_length)
+        max_len = min ([self.tokenizer.model_max_length, 256])
+        log.info("Max length: %s", max_len)
         # model name
         self.name = 'transformer-document-' + str(model)
 
@@ -110,7 +111,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
 
         # gradients are enabled if fine-tuning is enabled
         gradient_context = torch.enable_grad() if (self.fine_tune and self.training) else torch.no_grad()
-
+        max_len = min ([self.tokenizer.model_max_length, 256])
         with gradient_context:
 
             # first, subtokenize each sentence and find out into how many subtokens each token was divided
@@ -122,7 +123,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
                 # tokenize and truncate to max subtokens (TODO: check better truncation strategies)
                 subtokenized_sentence = self.tokenizer.encode(sentence.to_tokenized_string(),
                                                               add_special_tokens=True,
-                                                              max_length=self.tokenizer.model_max_length,
+                                                              max_length=max_len,
                                                               truncation=True,
                                                               )
 
