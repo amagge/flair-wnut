@@ -63,9 +63,9 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
             config = BertweetConfig.from_pretrained(model, output_hidden_states=True)
             self.model = BertweetModel.from_pretrained(model, config=config)
         else:
-        self.tokenizer = AutoTokenizer.from_pretrained(model)
-        config = AutoConfig.from_pretrained(model, output_hidden_states=True)
-        self.model = AutoModel.from_pretrained(model, config=config)
+            self.tokenizer = AutoTokenizer.from_pretrained(model)
+            config = AutoConfig.from_pretrained(model, output_hidden_states=True)
+            self.model = AutoModel.from_pretrained(model, config=config)
 
         log.info("Max length: %s", self.tokenizer.model_max_length)
         # model name
@@ -189,7 +189,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings):
             log.info("Special case: %s", model_name)
             self.tokenizer = BertweetTokenizer.from_pretrained(model_name)
         else:
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 
 class DocumentPoolEmbeddings(DocumentEmbeddings):
